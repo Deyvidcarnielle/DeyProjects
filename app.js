@@ -1,69 +1,41 @@
-const express = require('express') 
-//passa informações da pasta express para a constante express
-
-const userRepository = require('./repositories/users')
-
+const express = require('express')
+const userServices = require('./services/users')
 const app = express()
-//torna express uma função e joga pra constante app
 
 const port = 3000
-//definir a porta 3000 pro node
+
 
 app.use(express.json());
-//permitir o uso de JSON na aplicação
 
-
-//get users
-app.get('/users', (request, response) => { //users, define a rota e define a requisição e resposta do servidor
-  response.json(userRepository.getUsers()); //retorna todos os usuários do bd
+app.get('/users', (request, response) => { 
+  response.json(userServices.getUsers()); 
 })
 
-app.get('/users/:id', (request, response) =>{ //adicionar informações a um usuário específico
-
-  //pegar o id da requisição
+app.get('/users/:id', (request, response) =>{ 
   const idUser = request.params.id;
-
-  //encontrar o usuário correspondente no bd
- 
-  //responder a requisição com as infos do users
-  response.json(userRepository.getUserById(idUser));
+  response.json(userServices.getUserById(idUser));
 
 })
 
-app.post("/users", (request, response) =>{ //posto=creat, vai inserir um novo usuário
-
-  //pegar o corpo da requisição
+app.post("/users", (request, response) =>{ 
   const body = request.body;
-
-  //criar um novo objeto a partir desse corpo
- 
-
-  //responder a requisição com o banco completo
-  response.json(userRepository.createUser(body));
+  response.status(201).json(userServices.createUser(body));
 })
 
-app.delete("/users/:id", (request, response)=>{ //função para deletar informações
-
-  //pegar o id da requisição
+app.delete("/users/:id", (request, response)=>{ 
   const idUser = request.params.id;
 
-  userRepository.deleteUser(idUser),
+  userServices.deleteUser(idUser),
   response.json("Apagado com sucesso");
-
-  //deletar o condenado
-
-  //responder com o meu banco atualizado
 })
 
-app.patch("/users/:id", (request, response) => { //função para atualizar informações
-
-  //pegar o id da requisição
+app.patch("/users/:id", (request, response) => { 
   const idUser = request.params.id;
 
   const body = request.body;
 
   
-  userRepository.updateUser(idUser, body);
+  userServices.updateUser(idUser, body);
   response.status(200).json();
   })
 
