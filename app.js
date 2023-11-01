@@ -1,94 +1,72 @@
-const express = require('express')
+const express = require('express') 
+//passa informações da pasta express para a constante express
+
+const userRepository = require('./repositories/users')
+
 const app = express()
+//torna express uma função e joga pra constante app
+
 const port = 3000
+//definir a porta 3000 pro node
+
 app.use(express.json());
+//permitir o uso de JSON na aplicação
 
-let bd = [
 
-    {
-        id:"1",
-        name: "Felippe"
-    },
-    {
-        id: "2",
-        name: "Bruna"
-    }
-]
 //get users
-app.get('/users', (request, response) => {
-  response.json(bd);
+app.get('/users', (request, response) => { //users, define a rota e define a requisição e resposta do servidor
+  response.json(userRepository.getUsers()); //retorna todos os usuários do bd
 })
 
-app.get('/users/:id', (request, response) =>{
+app.get('/users/:id', (request, response) =>{ //adicionar informações a um usuário específico
 
   //pegar o id da requisição
   const idUser = request.params.id;
 
   //encontrar o usuário correspondente no bd
-  const user = bd.filter((usuario) => usuario.id === idUser);
-
+ 
   //responder a requisição com as infos do users
-  response.json(user);
+  response.json(userRepository.getUserById(idUser));
 
 })
 
-app.post("/users", (request, response) =>{
+app.post("/users", (request, response) =>{ //posto=creat, vai inserir um novo usuário
 
   //pegar o corpo da requisição
   const body = request.body;
 
   //criar um novo objeto a partir desse corpo
-  const newUser = {
-    id: (bd.length+1).toString(),
-    name: body.name
-  }
-
-  //adicionar esse novo objeto no banco
-  bd.push(newUser);
+ 
 
   //responder a requisição com o banco completo
-  response.json(bd);
+  response.json(userRepository.createUser(body));
 })
 
-app.delete("/users/:id", (request, response)=>{
+app.delete("/users/:id", (request, response)=>{ //função para deletar informações
 
   //pegar o id da requisição
   const idUser = request.params.id;
 
-  //percorrer o banco e encontrar quem tem o id da requisição
-  bd = bd.filter((usuario) => usuario.id != idUser);
+  userRepository.deleteUser(idUser),
+  response.json("Apagado com sucesso");
 
   //deletar o condenado
 
   //responder com o meu banco atualizado
-  response.json(bd);
 })
 
-app.patch("/users/:id", (request, response) => {
+app.patch("/users/:id", (request, response) => { //função para atualizar informações
 
   //pegar o id da requisição
   const idUser = request.params.id;
 
-  //pegar o corpo da requisição
   const body = request.body;
 
-  //percorrer o banco
-  bd = bd.map((usuario) => {
-
-    if (usuario.id === idUser){
-      //atualizar as informações
-      usuario.name = body.name;
-    }
-
-    return usuario
-
+  
+  userRepository.updateUser(idUser, body);
+  response.status(200).json();
   })
 
-  //atualizar as informações
-
-  //responder a requisição com o banco
-  response.json(bd);
-})
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
